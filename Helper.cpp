@@ -62,27 +62,26 @@ string errorMessages(int rule){
 }
 
 string parseError(int errcode, int linenum, int lineoffset) {
-    char buffer[100];
-    string parsedString;
-    string errorstring;
+    char buffer[150];
+    string errorString;
     switch (errcode){
-        case 1:  errorstring = "NUM_EXPECTED";        // Number expect
+        case 1: errorString = "NUM_EXPECTED";        // Number expect
             break;
-        case 2:  errorstring = "SYM_EXPECTED";   // Symbol Expected
+        case 2: errorString = "SYM_EXPECTED";   // Symbol Expected
             break;
-        case 3:  errorstring = "ADDR_EXPECTED";  // Addressing Expected which is A/E/I/R
+        case 3: errorString = "ADDR_EXPECTED";  // Addressing Expected which is A/E/I/R
             break;
-        case 4:  errorstring = "SYM_TOO_LONG";  // Symbol Name is too long
+        case 4: errorString = "SYM_TOO_LONG";  // Symbol Name is too long
             break;
-        case 5:  errorstring = "TOO_MANY_DEF_IN_MODULE"; // > 16
+        case 5: errorString = "TOO_MANY_DEF_IN_MODULE"; // > 16
             break;
-        case 6:  errorstring = "TOO_MANY_USE_IN_MODULE";     // > 16
+        case 6: errorString = "TOO_MANY_USE_IN_MODULE";     // > 16
             break;
-        case 7:  errorstring = "TOO_MANY_INSTR"; // total num_instr exceeds memory size (512
+        case 7: errorString = "TOO_MANY_INSTR"; // total num_instr exceeds memory size (512
             break;
     }
-//    sprintf(buffer, "Parse Error line %d offset %d: %s\n", linenum, lineoffset, errorstring);
-    return errorstring;
+    sprintf(buffer, "Parse Error line %d offset %d: %s\n", linenum, lineoffset, errorString.c_str());
+    return string(buffer);
 }
 
 void tokeniser(string line, vector <string> *tokens){
@@ -104,7 +103,7 @@ void tokeniser(string line, vector <string> *tokens){
 
 void readFile(vector <string> *tokens){
 
-    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-10");
+    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-9");
     if(input.is_open()) {
         while (!input.eof()) {
             string line;
@@ -119,12 +118,14 @@ void processOperandE(int opcode, int operand, map<string, string> symbolMap, vec
         processImmediate(memoryVec, operand*1000 + opcode, 6);
         return;
     }
+    char buffer [150];
     string symbol = declarationVec[opcode].first;
     declarationVec[opcode].second = true;
     int symbolValue = 0;
     string warning = "";
     if(symbolMap.find(symbol) == symbolMap.end()){
-        warning = errorMessages(3);
+        sprintf(buffer, errorMessages(3).c_str(), symbol.c_str());
+        warning += string(buffer);
     } else {
         symbolValue = stoi(symbolMap[symbol]);
     }
@@ -133,7 +134,9 @@ void processOperandE(int opcode, int operand, map<string, string> symbolMap, vec
 }
 
 void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pair<int, string>> &memoryVec, int moduleNo, map<string, bool> definedNotUsed){
-    string warning = "\n";
+    string warning = "";
+    warning+="\n";
+    char buffer [150];
     bool flag = false;
     for(int i = 0; i < declarationVec.size(); i++) {
         if(!declarationVec[i].second){
@@ -143,7 +146,8 @@ void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pa
             if(flag){
                 warning += "\n";
             }
-            warning += errorMessages(7);
+            sprintf(buffer, errorMessages(7).c_str(), moduleNo, declarationVec[i].first.c_str());
+            warning += string(buffer);
             flag = true;
         }
     }
@@ -154,14 +158,14 @@ void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pa
 
 void addDefinedNotUsedWarning(map<string, bool> definedNotUsed, vector <string> &warnings, int moduleNo){
     map<string, bool>::iterator it = definedNotUsed.begin();
-
+    char buffer[150];
     // Iterate over the map using Iterator till end.
     while (it != definedNotUsed.end()) {
-
         string warning = errorMessages(4);
         string symbol = it->first;
         if(it->second){
-            warning += " " + to_string(moduleNo) + " " + symbol;
+            sprintf(buffer, errorMessages(4).c_str(), moduleNo, symbol.c_str());
+            warning += string(buffer);
             warnings.push_back(warning);
         }
         it++;
