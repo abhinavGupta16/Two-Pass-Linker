@@ -37,25 +37,25 @@ void printSymbolTable(map<string, string> symbolMap) {
 string errorMessages(int rule){
     string errorstring;
     switch (rule){
-        case 2: errorstring = " Error: This variable is multiple times defined; first value used";
+        case 2: errorstring = "Error: This variable is multiple times defined; first value used";
             break;
-        case 3: errorstring = " Error: %s is not defined; zero used";
+        case 3: errorstring = "Error: %s is not defined; zero used";
             break;
         case 4: errorstring = "Warning: Module %d: %s was defined but never used";
             break;
         case 5: errorstring = "Warning: Module %d: %s too big %d (max=%d) assume zero relative";
             break;
-        case 6: errorstring = " Error: External address exceeds length of uselist; treated as immediate";
+        case 6: errorstring = "Error: External address exceeds length of uselist; treated as immediate";
             break;
         case 7: errorstring = "Warning: Module %d: %s appeared in the uselist but was not actually used";
             break;
-        case 8: errorstring = " Error: Absolute address exceeds machine size; zero used";
+        case 8: errorstring = "Error: Absolute address exceeds machine size; zero used";
             break;
-        case 9: errorstring = " Error: Relative address exceeds module size; zero used";
+        case 9: errorstring = "Error: Relative address exceeds module size; zero used";
             break;
-        case 10: errorstring = " Error: Illegal immediate value; treated as 9999";
+        case 10: errorstring = "Error: Illegal immediate value; treated as 9999";
             break;
-        case 11: errorstring = " Error: Illegal opcode; treated as 9999";
+        case 11: errorstring = "Error: Illegal opcode; treated as 9999";
             break;
     }
     return errorstring;
@@ -104,7 +104,7 @@ void tokeniser(string line, vector <string> *tokens){
 
 void readFile(vector <string> *tokens){
 
-    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-7");
+    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-10");
     if(input.is_open()) {
         while (!input.eof()) {
             string line;
@@ -115,7 +115,7 @@ void readFile(vector <string> *tokens){
 }
 
 void processOperandE(int opcode, int operand, map<string, string> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec){
-    if(opcode>declarationVec.size()){
+    if(opcode>=declarationVec.size()){
         processImmediate(memoryVec, operand*1000 + opcode, 6);
         return;
     }
@@ -148,7 +148,7 @@ void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pa
         }
     }
     if(flag){
-        memoryVec.back().second = warning;
+        memoryVec.back().second += warning;
     }
 }
 

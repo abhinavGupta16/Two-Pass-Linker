@@ -14,23 +14,23 @@ map<string, bool> definedNotUsed;
 string notDeclared = "-1";
 vector <pair<string, bool>> declarationVec;
 
-class Symbol{
-public:
-    string name;
-    int offset = -1;
+//class Symbol{
+//public:
+//    string name;
+//    int offset = -1;
+//
+//    Symbol (string n, int o) : name(n), offset(o){}
+//
+//    string getName() {
+//        return ( name );
+//    }
+//
+//    int getOffset() {
+//        return ( offset );
+//    }
+//};
 
-    Symbol (string n, int o) : name(n), offset(o){}
-
-    string getName() {
-        return ( name );
-    }
-
-    int getOffset() {
-        return ( offset );
-    }
-};
-
-Symbol readSym(vector <string> tokens, int globalOffset){
+void readSym(vector <string> tokens, int globalOffset){
     int value;
 
     try{
@@ -42,15 +42,14 @@ Symbol readSym(vector <string> tokens, int globalOffset){
         cout<<parseError(1,1,1);
         exit(3);
     }
-    Symbol sys(tokens[traverseVec], value);
+//    Symbol sys(tokens[traverseVec], value);
 
     if(symbolMap.find(tokens[traverseVec]) == symbolMap.end()) {//|| !symbolMap[tokens[traverseVec]].compare(notDeclared)){
         symbolMap[tokens[traverseVec]] = to_string(globalOffset + value);
     } else {
-        symbolMap[tokens[traverseVec]] = symbolMap[tokens[traverseVec]] + errorMessages(2);
+        symbolMap[tokens[traverseVec]] = symbolMap[tokens[traverseVec]] + " " + errorMessages(2);
     }
     traverseVec+=1;
-    return sys;
 }
 
 void readDecal(vector <string> tokens){
@@ -66,7 +65,7 @@ void pass1(vector <string> tokens){
         try{
             int defcount = stoi(tokens[traverseVec++]);
             for(int j = 0; j < defcount; j++) {
-                Symbol sym = readSym(tokens, globalOffset);
+                readSym(tokens, globalOffset);
                 traverseVec++;
             }
 
@@ -101,7 +100,7 @@ void pass2(vector <string> tokens){
         definedNotUsed.clear();
         for(int j = 0; j < defcount; j++) {
             definedNotUsed[tokens[traverseVec++]] = true;
-//            Symbol sym = readSym(tokens, globalOffset);
+//          readSym(tokens, globalOffset);
             traverseVec++;
         }
 
@@ -171,8 +170,8 @@ int main(){
 
     printMemoryVector(memoryVec);
     cout<<endl;
-    printVector(warnings);
+//    printVector(warnings);
     cout<<endl<<endl;
-
+    cout<<"end";
     return 0;
 }
