@@ -23,7 +23,7 @@ void printMemoryVector(vector <pair<int, string>> memoryVec){
     cout<<"Memory Map"<<endl;
     for(int i = 0; i < memoryVec.size(); i++) {
         cout << setw(3) << setfill('0') << memoryValue++;
-        cout << ": " << memoryVec[i].first << " " << memoryVec[i].second << endl;
+        cout << ": " << setw(4) << setfill('0') << memoryVec[i].first << " " << memoryVec[i].second << endl;
     }
 }
 
@@ -65,19 +65,19 @@ string parseError(int errcode, int linenum, int lineoffset) {
     char buffer[150];
     string errorString;
     switch (errcode){
-        case 1: errorString = "NUM_EXPECTED";        // Number expect
+        case 1: errorString = "NUM_EXPECTED";   // Number expect
             break;
         case 2: errorString = "SYM_EXPECTED";   // Symbol Expected
             break;
         case 3: errorString = "ADDR_EXPECTED";  // Addressing Expected which is A/E/I/R
             break;
-        case 4: errorString = "SYM_TOO_LONG";  // Symbol Name is too long
+        case 4: errorString = "SYM_TOO_LONG";   // Symbol Name is too long
             break;
         case 5: errorString = "TOO_MANY_DEF_IN_MODULE"; // > 16
             break;
-        case 6: errorString = "TOO_MANY_USE_IN_MODULE";     // > 16
+        case 6: errorString = "TOO_MANY_USE_IN_MODULE"; // > 16
             break;
-        case 7: errorString = "TOO_MANY_INSTR"; // total num_instr exceeds memory size (512
+        case 7: errorString = "TOO_MANY_INSTR"; // total num_instr exceeds memory size (512)
             break;
     }
     sprintf(buffer, "Parse Error line %d offset %d: %s\n", linenum, lineoffset, errorString.c_str());
@@ -102,8 +102,7 @@ void tokeniser(string line, vector <string> *tokens){
 }
 
 void readFile(vector <string> *tokens){
-
-    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-9");
+    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-10");
     if(input.is_open()) {
         while (!input.eof()) {
             string line;

@@ -34,13 +34,16 @@ void readSym(vector <string> tokens, int globalOffset){
     int value;
 
     try{
+        if(tokens[traverseVec].size()>16){
+            throw 4;
+        }
         if(traverseVec+1 > tokens.size()){
             throw 2;
         }
         value = stoi(tokens[traverseVec+1]);
-    } catch (...){
-        cout<<parseError(1,1,1);
-        exit(3);
+    } catch (int e){
+        cout<<parseError(e,1,1);
+        exit(e);
     }
 //    Symbol sys(tokens[traverseVec], value);
 
@@ -118,14 +121,18 @@ void pass2(vector <string> tokens){
             int operand =  value%1000;
             int opcode =  value/1000;
             string errorMsg = "";
+            bool flag = false;
+            int errorCode = -1;
             if(opcode>=10){
+                errorCode = 11;
                 value = 9999;
                 operand = value%1000;
                 opcode =  value/1000;
-                errorMsg = errorMessages(11);
+                errorMsg = errorMessages(errorCode);
+                flag = true;
             }
             if(!addressMode.compare("R")){
-                if(operand >= instcount){
+                if(operand >= instcount && !flag){
                     value = opcode*1000;
                     errorMsg = errorMessages(9);
                 }
@@ -133,9 +140,9 @@ void pass2(vector <string> tokens){
             } else if(!addressMode.compare("E")){
                 processOperandE(operand, opcode, symbolMap, memoryVec, declarationVec);
             } else if(!addressMode.compare("I")){
-                processImmediate(memoryVec, value, -1);
+                processImmediate(memoryVec, value, errorCode);
             } else if(!addressMode.compare("A")){
-                if(operand>=512){
+                if(operand>=512 && !flag){
                     value = opcode*1000;
                     errorMsg = errorMessages(8);
                 }
