@@ -35,7 +35,6 @@ void readSym(Tokeniser *tokeniser, int globalOffset){
     } else {
         symbolMap[sym] = symbolMap[sym] + " " + errorMessages(2);
     }
-//    traverseVec+=1;
 }
 
 void readDecal(Tokeniser *tokeniser){
@@ -141,7 +140,6 @@ int main(){
     string fileName = "D:\\NYU_assignment\\Spring_2020\\OS\\lab1samples\\input-4";
 
     Tokeniser tokeniser(fileName);
-    tokeniser.skip();
 
     pass1(&tokeniser);
 
@@ -150,7 +148,6 @@ int main(){
 
     // PASS 2
     tokeniser.reset();
-    tokeniser.skip();
 
     pass2(&tokeniser);
 

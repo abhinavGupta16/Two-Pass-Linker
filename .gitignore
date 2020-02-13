@@ -36,3 +36,5 @@
 *.iml
 
 cmake-build-debug/*
+CMakeLists.txt
+linker

@@ -4,7 +4,7 @@
 
 #include "Tokeniser.h"
 
-Tokeniser::Tokeniser(string fileName):input(fileName){}
+Tokeniser::Tokeniser(string fileName):input(fileName){skip();}
 string delimiters = " \n\t";
 
 bool Tokeniser::tokenComplete(char c, string &token){
@@ -38,6 +38,7 @@ void Tokeniser::skip(){
 void Tokeniser::reset(){
     input.clear();
     input.seekg(0, ios::beg);
+    skip();
 }
 
 bool Tokeniser::eof(){
