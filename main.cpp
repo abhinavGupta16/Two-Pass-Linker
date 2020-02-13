@@ -11,7 +11,6 @@ map<string, string> symbolMap;
 vector <pair<int, string>> memoryVec;
 vector <string> warnings;
 map<string, bool> definedNotUsed;
-string notDeclared = "-1";
 vector <pair<string, bool>> declarationVec;
 
 //class Symbol{

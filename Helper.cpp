@@ -102,7 +102,7 @@ void tokeniser(string line, vector <string> *tokens){
 }
 
 void readFile(vector <string> *tokens){
-    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-10");
+    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-1");
     if(input.is_open()) {
         while (!input.eof()) {
             string line;
