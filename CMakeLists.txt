@@ -3,4 +3,4 @@ project(Assignment1)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Assignment1 main.cpp Helper.cpp Helper.h)
+add_executable(Assignment1 main.cpp Helper.cpp Helper.h Tokeniser.cpp Tokeniser.h)

@@ -10,11 +10,11 @@
 
 using namespace std;
 
-void printVector(vector <string> vec);
+//void printVector(vector <string> vec);
 void printSymbolTable(map<string, string> symbolMap);
 string parseError(int errcode, int linenum, int lineoffset);
 string errorMessages(int rule);
-void readFile(vector <string> *tokens);
+//void readFile(vector <string> *tokens);
 void processOperandE(int opcode, int operand, map<string, string> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec);
 void printMemoryVector(vector <pair<int, string>> memoryVec);
 void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pair<int, string>> &memoryVec, int moduleNo, map<string, bool> definedNotUsed);

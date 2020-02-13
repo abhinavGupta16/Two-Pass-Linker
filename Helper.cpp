@@ -84,33 +84,33 @@ string parseError(int errcode, int linenum, int lineoffset) {
     return string(buffer);
 }
 
-void tokeniser(string line, vector <string> *tokens){
+//void tokeniser(string line, vector <string> *tokens){
+//
+//    stringstream check1(line);
+//    string intermediate;
+//
+//    while(getline(check1, intermediate)) {
+//        size_t prev = 0, pos;
+//        while ((pos = line.find_first_of(" \n\t", prev)) != string::npos) {
+//            if (pos > prev)
+//                tokens->push_back(line.substr(prev, pos-prev));
+//            prev = pos+1;
+//        }
+//        if (prev < line.length())
+//            tokens->push_back(line.substr(prev, string::npos));
+//    }
+//}
+//void readFile(vector <string> *tokens){
+//    ifstream input("D:\\NYU_assignment\\Spring_2020\\OS\\lab1samples\\input-1");
+//    if(input.is_open()) {
+//        if (!input.eof()) {
+//            string line;
+//            getline(input, line);
+//            tokeniser(line, tokens);
+//        }
+//    }
+//}
 
-    stringstream check1(line);
-    string intermediate;
-
-    while(getline(check1, intermediate)) {
-        size_t prev = 0, pos;
-        while ((pos = line.find_first_of(" \n\t", prev)) != string::npos) {
-            if (pos > prev)
-                tokens->push_back(line.substr(prev, pos-prev));
-            prev = pos+1;
-        }
-        if (prev < line.length())
-            tokens->push_back(line.substr(prev, string::npos));
-    }
-}
-
-void readFile(vector <string> *tokens){
-    ifstream input("D:\\NYU_assignment\\Spring 2020\\OS\\lab1samples\\input-1");
-    if(input.is_open()) {
-        while (!input.eof()) {
-            string line;
-            getline(input, line);
-            tokeniser(line, tokens);
-        }
-    }
-}
 
 void processOperandE(int opcode, int operand, map<string, string> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec){
     if(opcode>=declarationVec.size()){
