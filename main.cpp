@@ -6,14 +6,23 @@
 
 using namespace std;
 
+// Stores the Symbol Map
 unordered_map<string, string> symbolMap;
+// Maintains the order in which the variables were added to the symbolMap
 vector<string> symbolMapOrder;
+// Vector to maintain the Symbol and declared value
 vector<pair<string, int>> origSymbolValuePair;
+// Vector maintains the Memory Map
 vector <pair<int, string>> memoryVec;
+// Vector to add warnings
 vector <string> warnings;
+// Track of variables which were defined but not used
 unordered_map<string, int> definedNotUsed;
+// Vector to maintain the order of definedNotUsed Map
 vector<string> definedNotUsedOrder;
+// Vector to keep track of variables declared in a particular module
 vector <pair<string, bool>> declarationVec;
+// Vector to keep track of variables declared so far
 unordered_map<string, bool> allDeclarationVec;
 
 void readSym(Tokeniser *tokeniser, int globalOffset){
@@ -44,6 +53,7 @@ void readDecal(Tokeniser *tokeniser){
 void pass1(Tokeniser *tokeniser){
     int globalOffset = 0;
     int moduleNo = 1;
+    int totalInstCount = 0;
     while(!tokeniser->eof()) {
         try {
             origSymbolValuePair.clear();
@@ -57,7 +67,7 @@ void pass1(Tokeniser *tokeniser){
                 readDecal(tokeniser);
             }
 
-            int instcount = checkInstCount(tokeniser->getToken());
+            int instcount = checkInstCount(tokeniser->getToken(), totalInstCount);
             checkForRule5(origSymbolValuePair, warnings, instcount, moduleNo, symbolMap);
             for (int j = 0; j < instcount; j++) {
                 globalOffset++;
@@ -68,10 +78,13 @@ void pass1(Tokeniser *tokeniser){
         }
         catch (int e) {
             int lineoffset = tokeniser->tokenOffSet-tokeniser->tokenLength+1;
-            if(tokeniser->tokenExpected){
-                lineoffset = tokeniser->tokenOffSet+1;
+            int lineNum = tokeniser->tokenLineNum;
+            if(tokeniser->tokenNotExpected){
+                string s = tokeniser->getToken();
+                lineoffset = tokeniser->offset;
+                lineNum = tokeniser->linenum;
             }
-            cout << parseError(e, tokeniser->tokenLineNum, lineoffset);
+            cout << parseError(e, lineNum, lineoffset);
             exit(3);
         }
     }
@@ -105,18 +118,16 @@ void pass2(Tokeniser *tokeniser){
             int operand = value % 1000;
             int opcode = value / 1000;
             string errorMsg = "";
-            bool flag = false;
             int errorCode = -1;
-            if (opcode >= 10) {
+            if (opcode >= 10 && addressMode.compare("I")) {
                 errorCode = 11;
                 value = 9999;
                 operand = value % 1000;
                 opcode = value / 1000;
-                errorMsg = errorMessages(errorCode);
-                flag = true;
+                addressMode = "I";
             }
             if (!addressMode.compare("R")) {
-                if (operand >= instcount && !flag) {
+                if (operand >= instcount) {
                     value = opcode * 1000;
                     errorMsg = errorMessages(9);
                 }
@@ -126,7 +137,7 @@ void pass2(Tokeniser *tokeniser){
             } else if (!addressMode.compare("I")) {
                 processImmediate(memoryVec, value, errorCode);
             } else if (!addressMode.compare("A")) {
-                if (operand >= 512 && !flag) {
+                if (operand >= 512) {
                     value = opcode * 1000;
                     errorMsg = errorMessages(8);
                 }
@@ -144,9 +155,14 @@ void pass2(Tokeniser *tokeniser){
 }
 
 
-int main(){
-    string fileName = "D:\\NYU_assignment\\Spring_2020\\OS\\lab1samples\\temp";
+int main(int argc, char *argv[]){
 
+    string fileName = "D:\\NYU_assignment\\Spring_2020\\OS\\lab1samples\\input-12";
+    if(argc!=2){
+        cout<<"Expected argument after options"<<endl;
+        return 0;
+    }
+    fileName = argv[1];
     Tokeniser tokeniser(fileName);
 
     pass1(&tokeniser);
@@ -162,6 +178,5 @@ int main(){
     cout<<endl;
     printVector(warnings);
     cout<<endl<<endl;
-    cout<<"end";
     return 0;
 }

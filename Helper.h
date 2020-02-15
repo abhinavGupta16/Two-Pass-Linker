@@ -22,7 +22,7 @@ int convertToNum(string s);
 void printVector(vector <string> vec);
 string checkstring(string s);
 string checkAddress(string s);
-int checkInstCount(string s);
+int checkInstCount(string s, int &totalInstCount);
 int checkUseCount(string s);
 int checkDefCount(string s);
 void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, string> &symbolMap);

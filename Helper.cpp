@@ -117,6 +117,9 @@ void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pa
         if(!declarationVec[i].second){
             sprintf(buffer, errorMessages(7).c_str(), moduleNo, declarationVec[i].first.c_str());
             warning+= string(buffer);
+            if(i < declarationVec.size() - 1){
+                warning+="\n";
+            }
             flag = true;
         }
     }
@@ -158,6 +161,7 @@ void processImmediate(vector <pair<int, string>> &memoryVec, int value, int erro
     string errorMsg = "";
     if(value >=10000){
         errorCode = 10;
+        value = 9999;
     }
     if(errorCode != -1){
         errorMsg = errorMessages(errorCode);
@@ -198,9 +202,10 @@ string checkAddress(string s){
     }
 }
 
-int checkInstCount(string s){
+int checkInstCount(string s, int &totalInstCount){
     int num = convertToNum(s);
-    if(num>512){
+    totalInstCount+=num;
+    if(totalInstCount>512){
         throw 7;
     }
     return num;

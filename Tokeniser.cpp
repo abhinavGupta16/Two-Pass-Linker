@@ -9,7 +9,7 @@ Tokeniser::Tokeniser(string fileName):input(fileName){
     offset = 0;
     prevOffset = 0;
     resetValues = false;
-    tokenExpected = false;
+    tokenNotExpected = false;
     skip();
 }
 string delimiters = " \n\t";
@@ -29,27 +29,26 @@ string Tokeniser::getToken(){
     string temp = prevToken;
     tokenLineNum = prevLineNum;
     tokenOffSet = prevOffset;
+    tokenLength = temp.size();
     skip();
     if(temp==""){
-        tokenExpected = true;
+        tokenNotExpected = true;
     }
     return temp;
 }
 
 void Tokeniser::skip(){
     string token = "";
-    if(resetValues){
-        offset=0;
-        linenum++;
-        resetValues=false;
-    }
-    int tempOffSet = 1;
     if(input.is_open()) {
         char c;
         while (input.get(c)) {
+            if(resetValues){
+                offset=0;
+                linenum++;
+                resetValues=false;
+            }
             offset++;
             if(tokenComplete(c, token) && token.size() > 0) {
-                tokenLength = token.size();
                 prevLineNum = linenum;
                 prevOffset = offset-1;
                 prevToken = token;

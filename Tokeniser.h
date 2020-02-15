@@ -14,7 +14,7 @@ private:
     ifstream input;
     bool resetValues;
 public:
-    bool tokenExpected;
+    bool tokenNotExpected;
     string prevToken;
     int prevOffset;
     int prevLineNum;
