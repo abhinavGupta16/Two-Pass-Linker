@@ -6,13 +6,13 @@
 
 using namespace std;
 
-// Stores the Symbol Map
+// Stores the Symbol Map and value
 unordered_map<string, string> symbolMap;
 // Maintains the order in which the variables were added to the symbolMap
 vector<string> symbolMapOrder;
 // Vector to maintain the Symbol and declared value
 vector<pair<string, int>> origSymbolValuePair;
-// Vector maintains the Memory Map
+// Vector maintains the Memory Map and error
 vector <pair<int, string>> memoryVec;
 // Vector to add warnings
 vector <string> warnings;
@@ -25,6 +25,9 @@ vector <pair<string, bool>> declarationVec;
 // Vector to keep track of variables declared so far
 unordered_map<string, bool> allDeclarationVec;
 
+/*
+ * Reads the Definition List
+ */
 void readSym(Tokeniser *tokeniser, int globalOffset){
     string sym = checkstring(tokeniser->getToken());
     int value = convertToNum(tokeniser->getToken());
@@ -42,7 +45,8 @@ void readSym(Tokeniser *tokeniser, int globalOffset){
     }
 }
 
-void readDecal(Tokeniser *tokeniser){
+// Reads the UseList
+void readUseList(Tokeniser *tokeniser){
     string symbol = checkstring(tokeniser->getToken());
     if(symbol.size()>16){
         throw 4;
@@ -64,7 +68,7 @@ void pass1(Tokeniser *tokeniser){
 
             int usecount = checkUseCount(tokeniser->getToken());
             for (int j = 0; j < usecount; j++) {
-                readDecal(tokeniser);
+                readUseList(tokeniser);
             }
 
             int instcount = checkInstCount(tokeniser->getToken(), totalInstCount);
@@ -108,7 +112,7 @@ void pass2(Tokeniser *tokeniser){
         int usecount = stoi(tokeniser->getToken());
         declarationVec.clear();
         for (int j = 0; j < usecount; j++) {
-            readDecal(tokeniser);
+            readUseList(tokeniser);
         }
 
         int instcount = stoi(tokeniser->getToken());
@@ -157,16 +161,15 @@ void pass2(Tokeniser *tokeniser){
 
 int main(int argc, char *argv[]){
 
-    string fileName = "D:\\NYU_assignment\\Spring_2020\\OS\\lab1samples\\input-12";
     if(argc!=2){
         cout<<"Expected argument after options"<<endl;
         return 0;
     }
-    fileName = argv[1];
+    string fileName = argv[1];
     Tokeniser tokeniser(fileName);
 
     pass1(&tokeniser);
-    printVector(warnings);
+    printWarnings(warnings);
     printSymbolTable(symbolMap, symbolMapOrder);
     warnings.clear();
     cout<<endl;
@@ -176,7 +179,7 @@ int main(int argc, char *argv[]){
     pass2(&tokeniser);
     printMemoryVector(memoryVec);
     cout<<endl;
-    printVector(warnings);
+    printWarnings(warnings);
     cout<<endl<<endl;
     return 0;
 }

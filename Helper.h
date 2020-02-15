@@ -19,7 +19,7 @@ void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pa
 void addDefinedNotUsedWarning(unordered_map<string, int> definedNotUsed, vector <string> &warnings, vector<string> definedNotUsedOrder, unordered_map<string, bool> &allDeclarationVec);
 void processImmediate(vector <pair<int, string>> &memoryVec, int value, int errorCode);
 int convertToNum(string s);
-void printVector(vector <string> vec);
+void printWarnings(vector <string> vec);
 string checkstring(string s);
 string checkAddress(string s);
 int checkInstCount(string s, int &totalInstCount);

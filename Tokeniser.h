@@ -13,11 +13,11 @@ class Tokeniser {
 private:
     ifstream input;
     bool resetValues;
-public:
-    bool tokenNotExpected;
-    string prevToken;
     int prevOffset;
     int prevLineNum;
+    string prevToken;
+public:
+    bool tokenNotExpected;
     int tokenLength;
     int tokenLineNum;
     int tokenOffSet;

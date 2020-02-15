@@ -9,14 +9,18 @@
 
 using namespace std;
 
-
-void printVector(vector <string> vec){
-    // Printing the vector
+/*
+ * Prints the warning Messages
+ */
+void printWarnings(vector <string> vec){
     for(int i = 0; i < vec.size(); i++) {
         cout << vec[i] << '\n';
     }
 }
 
+/*
+ * Prints the Memory Vector
+ */
 void printMemoryVector(vector <pair<int, string>> memoryVec){
     int memoryValue = 0;
     cout<<"Memory Map"<<endl;
@@ -30,6 +34,9 @@ void printMemoryVector(vector <pair<int, string>> memoryVec){
     }
 }
 
+/*
+ * Prints the symbol Table
+ */
 void printSymbolTable(unordered_map<string, string> symbolMap, vector<string> symbolMapOrder) {
     cout<<"Symbol Table"<<endl;
     for(int i = 0; i< symbolMapOrder.size(); i++){
@@ -37,6 +44,9 @@ void printSymbolTable(unordered_map<string, string> symbolMap, vector<string> sy
     }
 }
 
+/*
+ * Returns the Error Message based on the Rule number
+ */
 string errorMessages(int rule){
     string errorstring;
     switch (rule){
@@ -64,6 +74,9 @@ string errorMessages(int rule){
     return errorstring;
 }
 
+/*
+ * Returns the Parsing error based on the Rule number
+ */
 string parseError(int errcode, int linenum, int lineoffset) {
     char buffer[150];
     string errorString;
@@ -87,6 +100,9 @@ string parseError(int errcode, int linenum, int lineoffset) {
     return string(buffer);
 }
 
+/*
+ * Process the E instruction
+ */
 void processOperandE(int opcode, int operand, unordered_map<string, string> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec){
     if(opcode>=declarationVec.size()){
         processImmediate(memoryVec, operand*1000 + opcode, 6);
@@ -107,6 +123,9 @@ void processOperandE(int opcode, int operand, unordered_map<string, string> symb
     memoryVec.push_back(make_pair(eValue, warning));
 }
 
+/*
+ * Checks the use list for Rule 7 violation
+ */
 void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pair<int, string>> &memoryVec, int moduleNo, unordered_map<string, bool> &allDeclarationVec){
     string warning = "\n";
     char buffer [150];
@@ -124,19 +143,6 @@ void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pa
         }
     }
 
-//    for(int i = 0; i < declarationVec.size(); i++) {
-//        if(!declarationVec[i].second){
-//            if(definedNotUsed.find(declarationVec[i].first) == definedNotUsed.end()){
-//                definedNotUsed[declarationVec[i].first] = false;
-//            }
-//            if(flag){
-//                warning += "\n";
-//            }
-//            sprintf(buffer, errorMessages(7).c_str(), moduleNo, declarationVec[i].first.c_str());
-//            warning += string(buffer);
-//            flag = true;
-//        }
-//    }
     if(flag){
         if(memoryVec.size()==0){
             memoryVec.push_back(make_pair(-1, warning.substr(1)));
@@ -146,6 +152,9 @@ void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pa
     }
 }
 
+/*
+* Check for warnings for Rule 4 violation
+*/
 void addDefinedNotUsedWarning(unordered_map<string, int> definedNotUsed, vector <string> &warnings, vector<string> definedNotUsedOrder, unordered_map<string, bool> &allDeclarationVec){
     char buffer[150];
     for(int i = 0; i < definedNotUsedOrder.size(); i++){
@@ -157,6 +166,9 @@ void addDefinedNotUsedWarning(unordered_map<string, int> definedNotUsed, vector 
     }
 }
 
+/*
+* Process the Instruction I
+*/
 void processImmediate(vector <pair<int, string>> &memoryVec, int value, int errorCode){
     string errorMsg = "";
     if(value >=10000){
@@ -169,6 +181,9 @@ void processImmediate(vector <pair<int, string>> &memoryVec, int value, int erro
     memoryVec.push_back(make_pair(value, errorMsg));
 }
 
+/*
+* Check parse error and convert string to num
+*/
 int convertToNum(string s){
     try{
         return stoi(s);
@@ -177,6 +192,9 @@ int convertToNum(string s){
     }
 }
 
+/*
+* Check if a value is a number
+*/
 bool isNumber(string s)
 {
     for (int i = 0; i < s.length(); i++)
@@ -186,6 +204,9 @@ bool isNumber(string s)
     return true;
 }
 
+/*
+* Check parse error expecting string
+*/
 string checkstring(string s){
     if(isNumber(s)){
         throw 2;
@@ -194,6 +215,9 @@ string checkstring(string s){
     }
 }
 
+/*
+* Check for Instruction parse error
+*/
 string checkAddress(string s){
     if (s=="R" || s=="A" || s=="I" || s=="E") {
         return s;
@@ -202,6 +226,9 @@ string checkAddress(string s){
     }
 }
 
+/*
+* Parse error too many instructions
+*/
 int checkInstCount(string s, int &totalInstCount){
     int num = convertToNum(s);
     totalInstCount+=num;
@@ -211,6 +238,9 @@ int checkInstCount(string s, int &totalInstCount){
     return num;
 }
 
+/*
+* Parse error too many variables in Use List
+*/
 int checkUseCount(string s){
     int num = convertToNum(s);
     if(num>16){
@@ -219,6 +249,9 @@ int checkUseCount(string s){
     return num;
 }
 
+/*
+* Parse error too many variables in Definition List
+*/
 int checkDefCount(string s){
     int num = convertToNum(s);
     if(num>16){
@@ -227,6 +260,9 @@ int checkDefCount(string s){
     return num;
 }
 
+/*
+* Check error for rule 5
+*/
 void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, string> &symbolMap){
     char buffer[150];
     for(int i = 0; i < origSymbolValuePair.size(); i++){
