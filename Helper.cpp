@@ -21,8 +21,12 @@ void printMemoryVector(vector <pair<int, string>> memoryVec){
     int memoryValue = 0;
     cout<<"Memory Map"<<endl;
     for(int i = 0; i < memoryVec.size(); i++) {
-        cout << setw(3) << setfill('0') << memoryValue++;
-        cout << ": " << setw(4) << setfill('0') << memoryVec[i].first << " " << memoryVec[i].second << endl;
+        if(memoryVec[i].first==-1){
+            cout<< memoryVec[i].second << endl;
+        } else {
+            cout << setw(3) << setfill('0') << memoryValue++;
+            cout << ": " << setw(4) << setfill('0') << memoryVec[i].first << " " << memoryVec[i].second << endl;
+        }
     }
 }
 
@@ -131,7 +135,11 @@ void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pa
 //        }
 //    }
     if(flag){
-        memoryVec.back().second += warning;
+        if(memoryVec.size()==0){
+            memoryVec.push_back(make_pair(-1, warning.substr(1)));
+        } else {
+            memoryVec.back().second += warning;
+        }
     }
 }
 
@@ -212,4 +220,17 @@ int checkDefCount(string s){
         throw 5;
     }
     return num;
+}
+
+void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, string> &symbolMap){
+    char buffer[150];
+    for(int i = 0; i < origSymbolValuePair.size(); i++){
+        string symbol = origSymbolValuePair[i].first;
+        int value = origSymbolValuePair[i].second;
+        if(instCount <= value){
+            symbolMap[symbol] = to_string(stoi(symbolMap[symbol]) - value);
+            sprintf(buffer, errorMessages(5).c_str(), moduleNo, symbol.c_str(), value, instCount-1);
+            warnings.push_back(string(buffer));
+        }
+    }
 }
