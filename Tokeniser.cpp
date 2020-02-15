@@ -68,7 +68,3 @@ void Tokeniser::reset(){
 bool Tokeniser::eof(){
     return input.eof();
 }
-
-int Tokeniser::getOffset(){
-    return input.tellg();
-}

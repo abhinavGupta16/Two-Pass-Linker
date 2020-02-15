@@ -29,8 +29,6 @@ public:
     void reset();
     bool eof();
     void skip();
-    int getOffset();
-
 };
 
 
