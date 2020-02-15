@@ -26,10 +26,10 @@ void printMemoryVector(vector <pair<int, string>> memoryVec){
     }
 }
 
-void printSymbolTable(map<string, string> symbolMap) {
+void printSymbolTable(unordered_map<string, string> symbolMap, vector<string> symbolMapOrder) {
     cout<<"Symbol Table"<<endl;
-    for(auto elem : symbolMap) {
-        cout << elem.first << "=" << elem.second << "\n";
+    for(int i = 0; i< symbolMapOrder.size(); i++){
+        cout << symbolMapOrder[i] << "=" << symbolMap[symbolMapOrder[i]] << "\n";
     }
 }
 
@@ -83,7 +83,7 @@ string parseError(int errcode, int linenum, int lineoffset) {
     return string(buffer);
 }
 
-void processOperandE(int opcode, int operand, map<string, string> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec){
+void processOperandE(int opcode, int operand, unordered_map<string, string> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec){
     if(opcode>=declarationVec.size()){
         processImmediate(memoryVec, operand*1000 + opcode, 6);
         return;
@@ -103,42 +103,46 @@ void processOperandE(int opcode, int operand, map<string, string> symbolMap, vec
     memoryVec.push_back(make_pair(eValue, warning));
 }
 
-void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pair<int, string>> &memoryVec, int moduleNo, map<string, bool> definedNotUsed){
-    string warning = "";
-    warning+="\n";
+void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pair<int, string>> &memoryVec, int moduleNo, unordered_map<string, bool> &allDeclarationVec){
+    string warning = "\n";
     char buffer [150];
     bool flag = false;
+
     for(int i = 0; i < declarationVec.size(); i++) {
+        allDeclarationVec[declarationVec[i].first] = declarationVec[i].second;
         if(!declarationVec[i].second){
-            if(definedNotUsed.find(declarationVec[i].first) == definedNotUsed.end()){
-                definedNotUsed[declarationVec[i].first] = false;
-            }
-            if(flag){
-                warning += "\n";
-            }
             sprintf(buffer, errorMessages(7).c_str(), moduleNo, declarationVec[i].first.c_str());
-            warning += string(buffer);
+            warning+= string(buffer);
             flag = true;
         }
     }
+
+//    for(int i = 0; i < declarationVec.size(); i++) {
+//        if(!declarationVec[i].second){
+//            if(definedNotUsed.find(declarationVec[i].first) == definedNotUsed.end()){
+//                definedNotUsed[declarationVec[i].first] = false;
+//            }
+//            if(flag){
+//                warning += "\n";
+//            }
+//            sprintf(buffer, errorMessages(7).c_str(), moduleNo, declarationVec[i].first.c_str());
+//            warning += string(buffer);
+//            flag = true;
+//        }
+//    }
     if(flag){
         memoryVec.back().second += warning;
     }
 }
 
-void addDefinedNotUsedWarning(map<string, bool> definedNotUsed, vector <string> &warnings, int moduleNo){
-    map<string, bool>::iterator it = definedNotUsed.begin();
+void addDefinedNotUsedWarning(unordered_map<string, int> definedNotUsed, vector <string> &warnings, vector<string> definedNotUsedOrder, unordered_map<string, bool> &allDeclarationVec){
     char buffer[150];
-    // Iterate over the map using Iterator till end.
-    while (it != definedNotUsed.end()) {
-        string warning = errorMessages(4);
-        string symbol = it->first;
-        if(it->second){
-            sprintf(buffer, errorMessages(4).c_str(), moduleNo, symbol.c_str());
-            warning += string(buffer);
-            warnings.push_back(warning);
+    for(int i = 0; i < definedNotUsedOrder.size(); i++){
+        string symbol = definedNotUsedOrder[i];
+        if(allDeclarationVec.find(symbol) == allDeclarationVec.end() || !allDeclarationVec[symbol]) {
+            sprintf(buffer, errorMessages(4).c_str(), definedNotUsed[symbol], symbol.c_str());
+            warnings.push_back(string(buffer));
         }
-        it++;
     }
 }
 
@@ -151,4 +155,61 @@ void processImmediate(vector <pair<int, string>> &memoryVec, int value, int erro
         errorMsg = errorMessages(errorCode);
     }
     memoryVec.push_back(make_pair(value, errorMsg));
+}
+
+int convertToNum(string s){
+    try{
+        return stoi(s);
+    } catch(...){
+        throw 1;
+    }
+}
+
+bool isNumber(string s)
+{
+    for (int i = 0; i < s.length(); i++)
+        if (isdigit(s[i]) == false)
+            return false;
+
+    return true;
+}
+
+string checkstring(string s){
+    if(isNumber(s)){
+        throw 2;
+    } else {
+        return s;
+    }
+}
+
+string checkAddress(string s){
+    if (s=="R" || s=="A" || s=="I" || s=="E") {
+        return s;
+    } else {
+        throw 3;
+    }
+}
+
+int checkInstCount(string s){
+    int num = convertToNum(s);
+    if(num>512){
+        throw 7;
+    }
+    return num;
+}
+
+int checkUseCount(string s){
+    int num = convertToNum(s);
+    if(num>16){
+        throw 6;
+    }
+    return num;
+}
+
+int checkDefCount(string s){
+    int num = convertToNum(s);
+    if(num>16){
+        throw 5;
+    }
+    return num;
 }

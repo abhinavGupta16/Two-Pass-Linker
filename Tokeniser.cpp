@@ -4,10 +4,20 @@
 
 #include "Tokeniser.h"
 
-Tokeniser::Tokeniser(string fileName):input(fileName){skip();}
+Tokeniser::Tokeniser(string fileName):input(fileName){
+    linenum = 1;
+    offset = 0;
+    prevOffset = 0;
+    resetValues = false;
+    tokenExpected = false;
+    skip();
+}
 string delimiters = " \n\t";
 
 bool Tokeniser::tokenComplete(char c, string &token){
+    if(c == '\n'){
+        resetValues = true;
+    }
     if(delimiters.find(c)!=string::npos) {
         return true;
     }
@@ -17,16 +27,31 @@ bool Tokeniser::tokenComplete(char c, string &token){
 
 string Tokeniser::getToken(){
     string temp = prevToken;
+    tokenLineNum = prevLineNum;
+    tokenOffSet = prevOffset;
     skip();
+    if(temp==""){
+        tokenExpected = true;
+    }
     return temp;
 }
 
 void Tokeniser::skip(){
     string token = "";
+    if(resetValues){
+        offset=0;
+        linenum++;
+        resetValues=false;
+    }
+    int tempOffSet = 1;
     if(input.is_open()) {
         char c;
         while (input.get(c)) {
+            offset++;
             if(tokenComplete(c, token) && token.size() > 0) {
+                tokenLength = token.size();
+                prevLineNum = linenum;
+                prevOffset = offset-1;
                 prevToken = token;
                 return;
             }
@@ -45,3 +70,6 @@ bool Tokeniser::eof(){
     return input.eof();
 }
 
+int Tokeniser::getOffset(){
+    return input.tellg();
+}

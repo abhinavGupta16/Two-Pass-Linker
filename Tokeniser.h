@@ -12,14 +12,24 @@ using namespace std;
 class Tokeniser {
 private:
     ifstream input;
-    string prevToken;
+    bool resetValues;
 public:
+    bool tokenExpected;
+    string prevToken;
+    int prevOffset;
+    int prevLineNum;
+    int tokenLength;
+    int tokenLineNum;
+    int tokenOffSet;
+    int offset;
+    int linenum;
     Tokeniser(string fileName);
     string getToken();
     bool tokenComplete(char c, string &token);
     void reset();
     bool eof();
     void skip();
+    int getOffset();
 
 };
 

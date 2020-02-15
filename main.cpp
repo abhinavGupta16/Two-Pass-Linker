@@ -7,30 +7,32 @@
 
 using namespace std;
 
-map<string, string> symbolMap;
+unordered_map<string, string> symbolMap;
+vector<string> symbolMapOrder;
 vector <pair<int, string>> memoryVec;
 vector <string> warnings;
-map<string, bool> definedNotUsed;
+unordered_map<string, int> definedNotUsed;
+vector<string> definedNotUsedOrder;
 vector <pair<string, bool>> declarationVec;
+unordered_map<string, bool> allDeclarationVec;
 
 void readSym(Tokeniser *tokeniser, int globalOffset){
-    int value;
-    string sym = tokeniser->getToken();
-    string val = tokeniser->getToken();
+    string sym = checkstring(tokeniser->getToken());
+    int value = convertToNum(tokeniser->getToken());
     try{
         if(sym.size()>16){
             throw 4;
         }
-        if(val == "tokens.size()"){
+        if(value == 100000000){
             throw 2;
         }
-        value = stoi(val);
     } catch (int e){
         cout<<parseError(e,1,1);
         exit(e);
     }
 
-    if(symbolMap.find(sym) == symbolMap.end()) {//|| !symbolMap[tokens[traverseVec]].compare(notDeclared)){
+    if(symbolMap.find(sym) == symbolMap.end()) {
+        symbolMapOrder.push_back(sym);
         symbolMap[sym] = to_string(globalOffset + value);
     } else {
         symbolMap[sym] = symbolMap[sym] + " " + errorMessages(2);
@@ -38,35 +40,40 @@ void readSym(Tokeniser *tokeniser, int globalOffset){
 }
 
 void readDecal(Tokeniser *tokeniser){
-      declarationVec.push_back(make_pair(tokeniser->getToken(), false));
-//    if(symbolMap.find(tokens[traverseVec]) == symbolMap.end()){
-//        symbolMap[tokens[traverseVec]]= notDeclared;
-//    }
+    string symbol = checkstring(tokeniser->getToken());
+    if(symbol.size()>16){
+        throw 4;
+    }
+    declarationVec.push_back(make_pair(symbol, false));
 }
 
 void pass1(Tokeniser *tokeniser){
     int globalOffset = 0;
     while(!tokeniser->eof()) {
         try {
-            int defcount = stoi(tokeniser->getToken());
+            int defcount = checkDefCount(tokeniser->getToken());
             for (int j = 0; j < defcount; j++) {
                 readSym(tokeniser, globalOffset);
             }
 
-            int usecount = stoi(tokeniser->getToken());
+            int usecount = checkUseCount(tokeniser->getToken());
             for (int j = 0; j < usecount; j++) {
                 readDecal(tokeniser);
             }
 
-            int instcount = stoi(tokeniser->getToken());
+            int instcount = checkInstCount(tokeniser->getToken());
             for (int j = 0; j < instcount; j++) {
                 globalOffset++;
-                string addressMode = tokeniser->getToken();
-                int value = stoi(tokeniser->getToken());
+                string addressMode = checkAddress(tokeniser->getToken());
+                int value = convertToNum(tokeniser->getToken());
             }
         }
-        catch (...) {
-            cout << parseError(3, 1, 1);
+        catch (int e) {
+            int lineoffset = tokeniser->tokenOffSet-tokeniser->tokenLength+1;
+            if(tokeniser->tokenExpected){
+                lineoffset = tokeniser->tokenOffSet+1;
+            }
+            cout << parseError(e, tokeniser->tokenLineNum, lineoffset);
             exit(3);
         }
     }
@@ -77,10 +84,13 @@ void pass2(Tokeniser *tokeniser){
     int moduleBase = 0;
     int moduleNo = 1;
     while(!tokeniser->eof()) {
-        int defcount = stoi(tokeniser->getToken());
-        definedNotUsed.clear();
+        int defcount = convertToNum(tokeniser->getToken());
         for (int j = 0; j < defcount; j++) {
-            definedNotUsed[tokeniser->getToken()] = true;
+            string symbol = tokeniser->getToken();
+            if(definedNotUsed.find(symbol) == definedNotUsed.end()){
+                definedNotUsedOrder.push_back(symbol);
+                definedNotUsed[symbol] = moduleNo;
+            }
             tokeniser->skip();
         }
 
@@ -128,32 +138,31 @@ void pass2(Tokeniser *tokeniser){
         }
         if (instcount > 0) {
             moduleBase = globalOffset;
-            checkDeclarationVec(declarationVec, memoryVec, moduleNo, definedNotUsed);
-            addDefinedNotUsedWarning(definedNotUsed, warnings, moduleNo);
+            checkDeclarationVec(declarationVec, memoryVec, moduleNo, allDeclarationVec);
             moduleNo++;
         }
     }
+    addDefinedNotUsedWarning(definedNotUsed, warnings, definedNotUsedOrder, allDeclarationVec);
 }
 
 
 int main(){
-    string fileName = "D:\\NYU_assignment\\Spring_2020\\OS\\lab1samples\\input-4";
+    string fileName = "D:\\NYU_assignment\\Spring_2020\\OS\\lab1samples\\temp";
 
     Tokeniser tokeniser(fileName);
 
     pass1(&tokeniser);
 
-    printSymbolTable(symbolMap);
+    printSymbolTable(symbolMap, symbolMapOrder);
     cout<<endl;
 
     // PASS 2
     tokeniser.reset();
-
     pass2(&tokeniser);
 
     printMemoryVector(memoryVec);
     cout<<endl;
-//    printVector(warnings);
+    printVector(warnings);
     cout<<endl<<endl;
     cout<<"end";
     return 0;
