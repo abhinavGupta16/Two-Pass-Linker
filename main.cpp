@@ -7,9 +7,10 @@
 using namespace std;
 
 // Stores the Symbol Map and value
-unordered_map<string, string> symbolMap;
-// Maintains the order in which the variables were added to the symbolMap
-vector<string> symbolMapOrder;
+unordered_map<string, pair<int, string>> symbolMap;
+// Maintains the order in which the variables were added to the symbolMap and
+// module number they were added in
+vector<pair<string, int>> symbolMapOrder;
 // Vector to maintain the Symbol and declared value
 vector<pair<string, int>> origSymbolValuePair;
 // Vector maintains the Memory Map and error
@@ -28,20 +29,20 @@ unordered_map<string, bool> allDeclarationVec;
 /*
  * Reads the Definition List
  */
-void readSym(Tokeniser *tokeniser, int globalOffset){
+void readSym(Tokeniser *tokeniser, int globalOffset, int moduleNo){
     string sym = checkstring(tokeniser->getToken());
-    int value = convertToNum(tokeniser->getToken());
-
     if(sym.size()>16){
         throw 4;
     }
+    int value = convertToNum(tokeniser->getToken());
 
     if(symbolMap.find(sym) == symbolMap.end()) {
-        symbolMapOrder.push_back(sym);
+        symbolMapOrder.push_back(make_pair(sym, moduleNo));
         origSymbolValuePair.push_back(make_pair(sym, value));
-        symbolMap[sym] = to_string(globalOffset + value);
+        symbolMap[sym].first = globalOffset + value;
     } else {
-        symbolMap[sym] = symbolMap[sym] + " " + errorMessages(2);
+        origSymbolValuePair.push_back(make_pair(sym, value));
+        symbolMap[sym].second = errorMessages(2);
     }
 }
 
@@ -63,7 +64,7 @@ void pass1(Tokeniser *tokeniser){
             origSymbolValuePair.clear();
             int defcount = checkDefCount(tokeniser->getToken());
             for (int j = 0; j < defcount; j++) {
-                readSym(tokeniser, globalOffset);
+                readSym(tokeniser, globalOffset, moduleNo);
             }
 
             int usecount = checkUseCount(tokeniser->getToken());
@@ -72,7 +73,7 @@ void pass1(Tokeniser *tokeniser){
             }
 
             int instcount = checkInstCount(tokeniser->getToken(), totalInstCount);
-            checkForRule5(origSymbolValuePair, warnings, instcount, moduleNo, symbolMap);
+            checkForRule5(origSymbolValuePair, warnings, instcount, moduleNo, symbolMap, symbolMapOrder);
             for (int j = 0; j < instcount; j++) {
                 globalOffset++;
                 string addressMode = checkAddress(tokeniser->getToken());

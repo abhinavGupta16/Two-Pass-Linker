@@ -10,10 +10,10 @@
 
 using namespace std;
 
-void printSymbolTable(unordered_map<string, string> symbolMap, vector<string> symbolMapOrder);
+void printSymbolTable(unordered_map<string, pair<int, string>> symbolMap, vector<pair<string,int>> symbolMapOrder);
 string parseError(int errcode, int linenum, int lineoffset);
 string errorMessages(int rule);
-void processOperandE(int opcode, int operand, unordered_map<string, string> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec);
+void processOperandE(int opcode, int operand, unordered_map<string, pair<int, string>> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec);
 void printMemoryVector(vector <pair<int, string>> memoryVec);
 void checkDeclarationVec(vector <pair<string, bool>> &declarationVec, vector <pair<int, string>> &memoryVec, int moduleNo, unordered_map<string, bool> &allDeclarationVec);
 void addDefinedNotUsedWarning(unordered_map<string, int> definedNotUsed, vector <string> &warnings, vector<string> definedNotUsedOrder, unordered_map<string, bool> &allDeclarationVec);
@@ -25,5 +25,5 @@ string checkAddress(string s);
 int checkInstCount(string s, int &totalInstCount);
 int checkUseCount(string s);
 int checkDefCount(string s);
-void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, string> &symbolMap);
+void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, pair<int, string>> &symbolMap, vector<pair<string, int>> symbolMapOrder);
 #endif //ASSIGNMENT1_HELPER_H

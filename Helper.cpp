@@ -37,10 +37,14 @@ void printMemoryVector(vector <pair<int, string>> memoryVec){
 /*
  * Prints the symbol Table
  */
-void printSymbolTable(unordered_map<string, string> symbolMap, vector<string> symbolMapOrder) {
+void printSymbolTable(unordered_map<string, pair<int, string>> symbolMap, vector<pair<string, int>> symbolMapOrder) {
     cout<<"Symbol Table"<<endl;
     for(int i = 0; i< symbolMapOrder.size(); i++){
-        cout << symbolMapOrder[i] << "=" << symbolMap[symbolMapOrder[i]] << "\n";
+        string error = "";
+        if(symbolMap[symbolMapOrder[i].first].second.compare("")){
+            error = " " + symbolMap[symbolMapOrder[i].first].second;
+        }
+        cout << symbolMapOrder[i].first << "=" << symbolMap[symbolMapOrder[i].first].first << error << "\n";
     }
 }
 
@@ -103,7 +107,7 @@ string parseError(int errcode, int linenum, int lineoffset) {
 /*
  * Process the E instruction
  */
-void processOperandE(int opcode, int operand, unordered_map<string, string> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec){
+void processOperandE(int opcode, int operand, unordered_map<string, pair<int, string>> symbolMap, vector <pair<int, string>> &memoryVec, vector <pair<string, bool>> &declarationVec){
     if(opcode>=declarationVec.size()){
         processImmediate(memoryVec, operand*1000 + opcode, 6);
         return;
@@ -117,7 +121,7 @@ void processOperandE(int opcode, int operand, unordered_map<string, string> symb
         sprintf(buffer, errorMessages(3).c_str(), symbol.c_str());
         warning += string(buffer);
     } else {
-        symbolValue = stoi(symbolMap[symbol]);
+        symbolValue = symbolMap[symbol].first;
     }
     int eValue = operand*1000 + symbolValue;
     memoryVec.push_back(make_pair(eValue, warning));
@@ -263,13 +267,30 @@ int checkDefCount(string s){
 /*
 * Check error for rule 5
 */
-void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, string> &symbolMap){
+void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, pair<int, string>> &symbolMap,
+        vector<pair<string, int>> symbolMapOrder){
     char buffer[150];
+    unordered_set<string> errorSymbolSet;
+    unordered_set<string> definedSymbolSet;
     for(int i = 0; i < origSymbolValuePair.size(); i++){
         string symbol = origSymbolValuePair[i].first;
         int value = origSymbolValuePair[i].second;
-        if(instCount <= value){
-            symbolMap[symbol] = to_string(stoi(symbolMap[symbol]) - value);
+        bool errorFlag = true;
+        if(symbolMap[symbol].second.compare("")){
+            for (int j = 0; j < symbolMapOrder.size(); j++) {
+                if (symbolMapOrder[j].first == symbol && symbolMapOrder[j].second != moduleNo || (errorSymbolSet.find(symbol) != errorSymbolSet.end() && instCount !=0)) {
+                    errorFlag = false;
+                    break;
+                }
+            }
+        }
+        if(instCount <= value && errorFlag){
+            if(errorSymbolSet.find(symbol) == errorSymbolSet.end()) {
+                symbolMap[symbol].first = symbolMap[symbol].first - value;
+                errorSymbolSet.insert(symbol);
+            } else {
+                value = symbolMap[symbol].first;
+            }
             sprintf(buffer, errorMessages(5).c_str(), moduleNo, symbol.c_str(), value, instCount-1);
             warnings.push_back(string(buffer));
         }
