@@ -82,6 +82,7 @@ void pass1(Tokeniser *tokeniser){
             moduleNo++;
         }
         catch (int e) {
+            printWarnings(warnings);
             int lineoffset = tokeniser->tokenOffSet-tokeniser->tokenLength+1;
             int lineNum = tokeniser->tokenLineNum;
             if(tokeniser->tokenNotExpected){
