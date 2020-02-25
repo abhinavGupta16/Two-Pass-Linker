@@ -272,7 +272,7 @@ int checkDefCount(string s){
 * Check error for rule 5
 */
 void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, pair<int, string>> &symbolMap,
-        vector<pair<string, int>> symbolMapOrder){
+        vector<pair<string, int>> symbolMapOrder, bool instZeroFlag){
     char buffer[150];
     unordered_set<string> errorSymbolSet;
     unordered_set<string> definedSymbolSet;
@@ -283,13 +283,14 @@ void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string
         if(symbolMap[symbol].second.compare("")){
             for (int j = 0; j < symbolMapOrder.size(); j++) {
                 if (symbolMapOrder[j].first == symbol && symbolMapOrder[j].second != moduleNo || (errorSymbolSet.find(symbol) != errorSymbolSet.end() && instCount !=0)) {
-                    errorFlag = false;
+                    if(!instFlag)
+                        errorFlag = false;
                     break;
                 }
             }
         }
         if(instCount <= value && errorFlag){
-            if(errorSymbolSet.find(symbol) == errorSymbolSet.end()) {
+            if(errorSymbolSet.find(symbol) == errorSymbolSet.end() && symbolMap[symbol].first!=0) {
                 symbolMap[symbol].first = symbolMap[symbol].first - value;
                 errorSymbolSet.insert(symbol);
             } else {

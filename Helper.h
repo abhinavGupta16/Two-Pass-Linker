@@ -25,5 +25,5 @@ string checkAddress(string s);
 int checkInstCount(string s, int &totalInstCount);
 int checkUseCount(string s);
 int checkDefCount(string s);
-void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, pair<int, string>> &symbolMap, vector<pair<string, int>> symbolMapOrder);
+void checkForRule5(vector<pair<string, int>> origSymbolValuePair, vector <string> &warnings, int instCount, int moduleNo, unordered_map<string, pair<int, string>> &symbolMap, vector<pair<string, int>> symbolMapOrder, bool instZeroFlag);
 #endif //ASSIGNMENT1_HELPER_H

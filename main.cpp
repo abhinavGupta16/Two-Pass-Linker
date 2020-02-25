@@ -59,6 +59,7 @@ void pass1(Tokeniser *tokeniser){
     int globalOffset = 0;
     int moduleNo = 1;
     int totalInstCount = 0;
+    bool instZeroFlag = true;   // Handle cases for rule 5 when instruction count declared so far is 0
     while(!tokeniser->eof()) {
         try {
             origSymbolValuePair.clear();
@@ -73,7 +74,9 @@ void pass1(Tokeniser *tokeniser){
             }
 
             int instcount = checkInstCount(tokeniser->getToken(), totalInstCount);
-            checkForRule5(origSymbolValuePair, warnings, instcount, moduleNo, symbolMap, symbolMapOrder);
+            if(instcount!=0)
+                instZeroFlag = false;
+            checkForRule5(origSymbolValuePair, warnings, instcount, moduleNo, symbolMap, symbolMapOrder, instZeroFlag);
             for (int j = 0; j < instcount; j++) {
                 globalOffset++;
                 string addressMode = checkAddress(tokeniser->getToken());
